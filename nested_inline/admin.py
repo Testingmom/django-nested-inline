@@ -101,37 +101,6 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
                     self.add_nested_inline_formsets(request, nested_inline, nested_formset, depth=depth + 1)
             form.nested_formsets = nested_formsets
 
-    def wrap_nested_inline_formsets(self, request, inline, formset):
-
-        media = None
-
-        def get_media(extra_media):
-            if media and extra_media and media != extra_media:
-                return media + extra_media
-            elif extra_media:
-                return extra_media
-            else:
-                return media
-
-        for form in formset.forms:
-            wrapped_nested_formsets = []
-            for nested_inline, nested_formset in zip(inline.get_inline_instances(request), form.nested_formsets):
-                if form.instance.pk:
-                    instance = form.instance
-                else:
-                    instance = None
-                fieldsets = list(nested_inline.get_fieldsets(request, instance))
-                readonly = list(nested_inline.get_readonly_fields(request, instance))
-                prepopulated = dict(nested_inline.get_prepopulated_fields(request, instance))
-                wrapped_nested_formset = helpers.InlineAdminFormSet(
-                    nested_inline, nested_formset,
-                    fieldsets, prepopulated, readonly, model_admin=self,
-                )
-                wrapped_nested_formsets.append(wrapped_nested_formset)
-                media = get_media(wrapped_nested_formset.media)
-            form.nested_formsets = wrapped_nested_formsets
-        return media
-
     def formset_has_nested_data(self, formsets):
         for formset in formsets:
             if not formset.is_bound:
@@ -254,12 +223,6 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
                                                               fieldsets, prepopulated, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
-            if hasattr(inline, 'inlines') and inline.inlines:
-                extra_media = self.wrap_nested_inline_formsets(
-                    request, inline, formset)
-
-                if extra_media:
-                    media += extra_media
 
         context = {
             'title': _('Add %s') % force_str(opts.verbose_name),
@@ -360,10 +323,6 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
             )
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
-            if hasattr(inline, 'inlines') and inline.inlines:
-                extra_media = self.wrap_nested_inline_formsets(request, inline, formset)
-                if extra_media:
-                    media += extra_media
 
         context = {
             'title': _('Change %s') % force_str(opts.verbose_name),
