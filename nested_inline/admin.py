@@ -105,8 +105,7 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
         media = None
 
         def get_media(extra_media):
-            print(media, extra_media)
-            if media and extra_media:
+            if media and extra_media and media != extra_media:
                 return media + extra_media
             elif extra_media:
                 return extra_media
