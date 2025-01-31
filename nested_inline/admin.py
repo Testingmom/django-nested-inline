@@ -6,7 +6,6 @@ from django.contrib.admin.options import InlineModelAdmin, reverse
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import models, transaction
-from django.forms.formsets import all_valid
 from django.http import Http404
 from django.templatetags.static import static
 from django.utils.decorators import method_decorator
@@ -145,12 +144,11 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
 
     def all_valid_with_nesting(self, formsets):
         "Recursively validate all nested formsets"
-        if not all_valid(formsets):
-            return False
-
         for formset in formsets:
             if not formset.is_bound:
                 continue
+            if not formset.is_valid():
+                return False
             for form in formset:
                 if hasattr(form, 'nested_formsets'):
                     if not self.all_valid_with_nesting(form.nested_formsets):
