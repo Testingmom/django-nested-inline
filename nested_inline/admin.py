@@ -150,7 +150,7 @@ class NestedModelAdmin(InlineInstancesMixin, admin.ModelAdmin):
 
         for formset in formsets:
             if not formset.is_bound:
-                pass
+                continue
             for form in formset:
                 if hasattr(form, 'nested_formsets'):
                     if not self.all_valid_with_nesting(form.nested_formsets):
