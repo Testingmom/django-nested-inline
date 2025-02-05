@@ -308,7 +308,13 @@
                 template.find(".form-row").not(".empty-form").remove();
                 template.find(".nested-inline-row").remove();
                 // Make a new form
-                template_form = template.find("#" + normalized_formset_prefix + "-empty")
+                template_form = template.find("#" + normalized_formset_prefix + "-empty");
+                template_form.find('input').each(function () {
+                    var $input = $(this)
+                    if ($input.val()) {
+                        $input.removeAttr('value')
+                    }
+                });
                 new_form = template_form.clone().removeClass(options.emptyCssClass).addClass("dynamic-" + formset_prefix);
 
                 new_form.insertBefore(template_form);
@@ -355,7 +361,13 @@
                 var nested_formsets = create_nested_formset(formset_prefix, 0, options, true);
                 template.find(".inline-related").not(".empty-form").remove();
                 // Make a new form
-                template_form = template.find("#" + normalized_formset_prefix + "-empty")
+                template_form = template.find("#" + normalized_formset_prefix + "-empty");
+                template_form.find('input').each(function () {
+                    var $input = $(this)
+                    if ($input.val()) {
+                        $input.removeAttr('value')
+                    }
+                });
                 new_form = template_form.clone().removeClass(options.emptyCssClass).addClass("dynamic-" + formset_prefix);
 
                 new_form.insertBefore(template_form);
